@@ -1,0 +1,329 @@
+/* =========================================
+   1. VARIABLES Y CONFIGURACIÓN GLOBAL
+   ========================================= */
+:root {
+    --primary: #8b5cf6;       /* Violeta Principal */
+    --primary-dark: #7c3aed;
+    --accent: #10b981;        /* Verde Acción */
+    --danger: #ef4444;        /* Rojo Alerta */
+    --bg: #0f172a;            /* Fondo Body */
+    --panel: #1e293b;         /* Fondo Paneles */
+    --panel-dark: #161e2e;    /* Fondo Editor */
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #334155;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg);
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden; /* Evita scroll global */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =========================================
+   2. LAYOUT PRINCIPAL (GRID)
+   ========================================= */
+.app-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px; /* Dashboard | Editor */
+    width: 100%;
+    max-width: 1000px;
+    height: 90vh;
+    gap: 20px;
+    padding: 0 20px;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Estado: Editor Cerrado */
+.app-layout.editor-closed {
+    grid-template-columns: 1fr 0px;
+    gap: 0;
+    max-width: 600px; /* Centrado estético */
+}
+
+/* Ocultar visualmente la zona derecha al cerrar */
+.app-layout.editor-closed .editor-zone {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* =========================================
+   3. ZONA IZQUIERDA (DASHBOARD)
+   ========================================= */
+.main-zone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    min-width: 0;
+    position: relative;
+}
+
+header { text-align: center; width: 100%; }
+h1 { margin: 0; text-shadow: 0 0 20px rgba(139, 92, 246, 0.4); font-size: 2.5rem; }
+.subtitle { color: var(--text-muted); margin: 5px 0 0 0; letter-spacing: 1px; }
+
+/* --- ORÁCULO --- */
+.oracle-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--panel);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+}
+
+.window {
+    height: 100px;
+    background: #000;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* Efecto 3D Cilindro */
+.window::before { content: ''; position: absolute; top:0; left:0; right:0; height: 20px; background: linear-gradient(to bottom, #000, transparent); z-index:2; }
+.window::after { content: ''; position: absolute; bottom:0; left:0; right:0; height: 20px; background: linear-gradient(to top, #000, transparent); z-index:2; }
+
+#spinner-text {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-align: center;
+    z-index: 1;
+    padding: 0 10px;
+}
+
+/* --- LISTAS --- */
+.lists-section { width: 100%; max-width: 500px; text-align: center; }
+
+.section-header-row {
+    display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 15px;
+}
+.section-title { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.lists-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+
+.list-pill {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.list-pill:hover { border-color: var(--primary); color: #fff; }
+.list-pill.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+}
+
+/* =========================================
+   4. ZONA DERECHA (EDITOR) - CORREGIDO
+   ========================================= */
+.editor-zone {
+    background: transparent;
+    border: none;
+    padding: 0;
+    
+    /* Flex para acomodar las dos cajas verticalmente */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    
+    /* VITAL: Altura fija y overflow hidden para que no se salga de la pantalla */
+    height: 100%;
+    overflow: hidden; 
+    min-width: 320px;
+}
+
+/* Estilos base de las cajas */
+.panel-box {
+    background: var(--panel-dark);
+    border: 1px dashed var(--border);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+/* CAJA 1: EDITOR PRINCIPAL (La que debe tener scroll interno) */
+.editor-main { 
+    /* Esta caja debe ocupar todo el espacio disponible */
+    flex: 1; 
+    
+    /* Convertimos esta caja en un Flex Column para controlar sus hijos */
+    display: flex;
+    flex-direction: column;
+    
+    /* VITAL: min-height 0 permite al flexbox calcular el scroll correctamente */
+    min-height: 0; 
+    overflow: hidden; 
+}
+
+/* Caja de abajo: Crear Nueva */
+.editor-new { 
+    flex-shrink: 0; 
+    background: var(--panel); 
+    border-style: solid; 
+    
+    /* AGREGADO: Usamos Flex para controlar el espacio verticalmente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centrar verticalmente */
+    gap: 15px; 
+}
+
+/* --- ELEMENTOS INTERNOS DEL EDITOR --- */
+
+.panel-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 15px; 
+    flex-shrink: 0; /* Que el encabezado no se aplaste */
+}
+
+.panel-header h3 { 
+    margin: 0; 
+    color: var(--primary); 
+    font-size: 1.1rem; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    max-width: 200px; 
+}
+
+.input-group { 
+    display: flex; 
+    gap: 8px; 
+    width: 100%; 
+    flex-shrink: 0; /* Que los inputs no se aplasten */
+    margin-bottom: 10px; /* Separación visual */
+}
+
+input {
+    background: var(--bg); 
+    border: 1px solid var(--border); 
+    color: white; 
+    padding: 10px; 
+    border-radius: 8px; 
+    flex: 1; 
+    outline: none;
+}
+input:focus { border-color: var(--primary); }
+
+/* LISTA DE ITEMS (Aquí es donde ocurre la magia del scroll) */
+.items-list {
+    list-style: none; 
+    padding: 0; 
+    margin: 10px 0; 
+    
+    /* VITAL: Scroll automático SOLO en Y */
+    overflow-y: auto; 
+    padding-right: 5px; 
+    
+    /* Ocupar el espacio restante dentro de .editor-main */
+    flex-grow: 1; 
+}
+
+/* Estilizar la barra de scroll para que se vea bonita */
+.items-list::-webkit-scrollbar { width: 5px; }
+.items-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+
+.item-row {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px; 
+    border-bottom: 1px solid var(--border); 
+    font-size: 0.9rem; 
+    animation: fadeIn 0.3s ease;
+}
+
+.danger-zone {
+    flex-shrink: 0; /* Que el botón de borrar no desaparezca */
+    margin-top: 10px;
+}
+
+/* =========================================
+   5. COMPONENTES Y UTILIDADES
+   ========================================= */
+/* Botones */
+.btn-spin {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white; width: 100%; padding: 15px; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: transform 0.1s;
+}
+.btn-spin:active { transform: scale(0.97); }
+
+.btn-icon { background: transparent; border: 1px solid var(--border); color: var(--text-muted); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+.btn-icon:hover { background: var(--border); color: white; transform: rotate(90deg); }
+
+.btn-icon-close { background:none; border:none; color: var(--text-muted); cursor: pointer; }
+.btn-icon-close:hover { color: white; }
+
+.btn-icon-add { background: var(--accent); border:none; border-radius:8px; color:#064e3b; cursor:pointer; width: 40px; display:flex; align-items:center; justify-content:center; }
+.btn-small-primary { background: var(--primary); border:none; border-radius:8px; color:white; cursor:pointer; padding: 0 15px; font-weight:bold;}
+
+.delete-x { color: var(--danger); cursor: pointer; padding: 5px; opacity: 0.7; }
+.delete-x:hover { opacity: 1; }
+
+.btn-text-danger { background:none; border:none; color: var(--danger); cursor:pointer; font-size:0.8rem; display:flex; align-items:center; gap:5px; margin-left:auto; opacity: 0.8;}
+.btn-text-danger:hover { opacity: 1; text-decoration: underline;}
+
+/* El texto pequeño "Crear nueva categoría:" */
+.label-muted { 
+    display: block; 
+    /* margin-bottom: 5px;  <-- Ya no es necesario si usamos gap, pero mal no hace */
+    font-size: 0.9rem;      /* Un pelín más grande para que se lea mejor */
+    color: var(--text-muted); 
+    font-weight: 500;       /* Un poco más gordita la letra */
+}
+
+/* Animaciones */
+.blur-effect { filter: blur(4px); transform: scaleY(1.1); opacity: 0.7; }
+@keyframes winner-pop {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.2); text-shadow: 0 0 30px var(--primary); color: #fff; }
+    100% { transform: scale(1); text-shadow: 0 0 10px var(--primary); color: var(--primary); }
+}
+.winner-animation { animation: winner-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(5px); } to { opacity:1; transform: translateY(0); } }
+
+/* --- BRANDING & FOOTER --- */
+.branding-footer {
+    margin-top: 30px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+}
+.branding-footer:hover { opacity: 1; }
+.branding-footer strong { color: var(--primary); }
+
+/* --- RESPONSIVE MOBILE --- */
+@media (max-width: 768px) {
+    body { height: auto; overflow-y: auto; padding: 20px 0; display: block; }
+    .app-layout { grid-template-columns: 1fr; height: auto; display: flex; flex-direction: column; max-width: 100%; }
+    
+    .app-layout.editor-closed .editor-zone { display: none; }
+    .editor-zone { min-height: 500px; } /* Altura mínima en móvil */
+}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicación web para tomar decisiones aleatorias. Desarrollada por FAC 4U.">
+
+    <title>El Oráculo de Bolsillo</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔮</text></svg>">
+</head>
+
+<body>
+
+    <div class="app-layout editor-closed" id="app-layout">
+
+        <main class="main-zone">
+
+            <header>
+                <h1>🔮 El Oráculo</h1>
+                <p class="subtitle">Deja que el destino decida</p>
+            </header>
+
+            <div class="oracle-container">
+                <div class="window">
+                    <div id="spinner-text">Cargando...</div>
+                </div>
+                <button class="btn-spin" onclick="spin()" aria-label="Girar opciones">
+                    <span>GIRAR EL DESTINO</span>
+                    <span class="material-icons">cached</span>
+                </button>
+            </div>
+
+            <div class="lists-section">
+                <div class="section-header-row">
+                    <span class="section-title">Tus Colecciones</span>
+                    <button class="btn-icon" onclick="toggleEditor()" title="Configurar Listas">
+                        <span class="material-icons">tune</span>
+                    </button>
+                </div>
+
+                <div class="lists-container" id="lists-wrapper">
+                </div>
+            </div>
+
+            <footer class="branding-footer">
+                <p>Desarrollado con 💜 por <strong>FACfory</strong> - 2026</p>
+            </footer>
+
+        </main>
+
+        <aside class="editor-zone">
+
+            <div class="panel-box editor-main">
+                <div class="panel-header">
+                    <h3 id="editor-title">✏️ Editor</h3>
+                    <button class="btn-icon-close" onclick="toggleEditor()" title="Cerrar editor">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="new-item-input" placeholder="Nuevo elemento..." autocomplete="off">
+                    <button class="btn-icon-add" onclick="addItem()">
+                        <span class="material-icons">add</span>
+                    </button>
+                </div>
+
+                <ul class="items-list" id="items-container">
+                </ul>
+
+                <div class="danger-zone">
+                    <button class="btn-text-danger" onclick="deleteCurrentList()">
+                        <span class="material-icons" style="font-size:16px">delete</span> Borrar colección
+                    </button>
+                </div>
+            </div>
+
+            <div class="panel-box editor-new">
+                <span class="label-muted">Crear nueva categoría:</span>
+                <div class="input-group">
+                    <input type="text" id="new-list-name" placeholder="Ej: Videojuegos" autocomplete="off">
+                    <button class="btn-small-primary" onclick="createNewList()">OK</button>
+                </div>
+            </div>
+
+        </aside>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
